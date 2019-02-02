@@ -1,344 +1,157 @@
-#define RED {255,0,0}
-#define ORANGE {255,0x80,0}
-#define YELLOW {255,255,0}
-#define GREEN {0,0x80,0}
-#define AQUA {0,255,255}
-#define TEAL {0,0x80,0x80}
-#define BLUE {0,0,255}
-#define PURPLE {0x80, 0, 0x80}
-
+#define C_RED {255,0,0}
+#define C_ORANGE {255,0x80,0}
+#define C_YELLOW {255,255,0}
+#define C_GREEN {0,0x80,0}
+#define C_AQUA {0,255,255}
+#define C_TEAL {0,0x60,0x80}
+#define C_BLUE {0,0,255}
+#define C_PURPLE {0x80, 0, 0x80}
+#define C_LT_RED {0x80,0,0}
+#define C_LT_ORANGE {0x80,0x40,0}
+#define C_LT_YELLOW {0x80,0x80,0}
+#define C_LT_GREEN {0,0x40,0}
+#define C_LT_AQUA {0,0x80,0x80}
+#define C_LT_TEAL {0,0x30,0x40}
+#define C_LT_BLUE {0,0,0x80}
+#define C_LT_PURPLE {0x40, 0, 0x40}
+#define C_OFF {0,0,0}
 
 typedef struct {
-  byte r;    // red value 0 to 4095
+  byte r;    // red value 0 to 255
   byte g;   // green value
   byte b;   // blue value
-} rgbcolor;
+} str_rgbcolor;
 
-int channel = 0;
-int first_note = 0;
+typedef struct {
+  bool   active;
+  byte   channel;
+  byte   note;
+  str_rgbcolor color;
+} str_btn;
+
+byte page = 0;
 int mode = MACRO;
 
-rgbcolor colors[8][128];
-rgbcolor banksel[8];
-
-int banksize = 8;
+str_btn button_set[31][31];
+str_rgbcolor banksel[31];
 
 void init_banksel(){
-  banksel[0] = RED;
-  banksel[1] = ORANGE;
-  banksel[2] = YELLOW;
-  banksel[3] = GREEN;
-  banksel[4] = TEAL;
-  banksel[5] = AQUA;
-  banksel[6] = BLUE;
-  banksel[7] = PURPLE;
+  banksel[0] = C_RED;
+  banksel[1] = C_ORANGE;
+  banksel[2] = C_YELLOW;
+  banksel[3] = C_GREEN;
+  banksel[4] = C_TEAL;
+  banksel[5] = C_AQUA;
+  banksel[6] = C_BLUE;
+  banksel[7] = C_PURPLE;
+  banksel[8] = C_LT_RED;
+  banksel[9] = C_LT_ORANGE;
+  banksel[10] = C_LT_YELLOW;
+  banksel[11] = C_LT_GREEN;
+  banksel[12] = C_LT_TEAL;
+  banksel[13] = C_LT_AQUA;
+  banksel[14] = C_LT_BLUE;
+  banksel[15] = C_LT_PURPLE;
 }
 
-void init_page_0(){ //Main
-  colors[0][0] = {25,25,25}; //Desktop 1
-  colors[0][1] = {50,50,50}; //Desktop 2
-  colors[0][2] = {75,75,75}; //Desktop 3
-  colors[0][3] = {100,100,100}; //Desktop 4
-  colors[0][4] = {125,125,125}; //Desktop 5
-  colors[0][5] = {0,0,0};
-  colors[0][6] = {0,0,0};
-  colors[0][7] = {0,0,0};
+void init_page_main(byte page){ //Main
+  byte channel = page;
+  button_set[page][0] = {true,channel,0,{25,25,25}}; //Desktop 1
+  button_set[page][1] = {true,channel,1,{50,50,50}}; //Desktop 2
+  button_set[page][2] = {true,channel,2,{75,75,75}}; //Desktop 3
+  button_set[page][3] = {true,channel,3,{100,100,100}}; //Desktop 4
+  button_set[page][4] = {true,channel,4,{125,125,125}}; //Desktop 5
+  button_set[page][5] = {false,channel,5,C_OFF};
+  button_set[page][6] = {false,channel,6,C_OFF};
+  button_set[page][7] = {false,channel,7,C_OFF};
 
-  colors[0][8] = {50,25,25}; //Desktop 1
-  colors[0][9] = {75,50,50}; //Desktop 2
-  colors[0][10] = {100,75,75}; //Desktop 3
-  colors[0][11] = {125,100,100}; //Desktop 4
-  colors[0][12] = {150,125,125}; //Desktop 5
-  colors[0][13] = {0,0,0};
-  colors[0][14] = {0,0,0};
-  colors[0][15] = {50,50,25}; //github.com
+  button_set[page][8] = {true,channel,8,{50,25,25}}; //Desktop 1
+  button_set[page][9] = {true,channel,9,{75,50,50}}; //Desktop 2
+  button_set[page][10] = {true,channel,10,{100,75,75}}; //Desktop 3
+  button_set[page][11] = {true,channel,11,{125,100,100}}; //Desktop 4
+  button_set[page][12] = {true,channel,12,{150,125,125}}; //Desktop 5
+  button_set[page][13] = {false,channel,13,C_OFF};
+  button_set[page][14] = {false,channel,14,C_OFF};
+  button_set[page][15] = {true,channel,15,{50,50,25}}; //github.com
 
-  colors[0][16] = {0,5,50}; //MS word Focus
-  colors[0][17] = {0,0,0};
-  colors[0][18] = {0,0,0};
-  colors[0][19] = {0,0,0};
-  colors[0][20] = {0,0,0};
-  colors[0][21] = {0,0,0};
-  colors[0][22] = {50,25,50}; //Exp
-  colors[0][23] = {25,50,25}; //bill
+  button_set[page][16] = {true,channel,0,{0,5,50}}; //MS word Focus
+  button_set[page][17] = {false,channel,0,C_OFF};
+  button_set[page][18] = {false,channel,0,C_OFF};
+  button_set[page][19] = {false,channel,0,C_OFF};
+  button_set[page][20] = {false,channel,0,C_OFF};
+  button_set[page][21] = {false,channel,0,C_OFF};
+  button_set[page][22] = {true,channel,0,{50,25,50}}; //Exp
+  button_set[page][23] = {true,channel,0,{25,50,25}}; //bill
 
-  colors[0][24] = {25,25,25}; //Lock Screen
-  colors[0][25] = {25,50,25}; //Eject
-  colors[0][26] = {0,0,0};
-  colors[0][27] = {0,0,0};
-  colors[0][28] = {0,0,0};
-  colors[0][29] = {0,0,0};
-  colors[0][30] = {0,0,0};
-}
-
-void init_page_1(){
-  colors[1][0] = {0,0,0};
-  colors[1][1] = {0,0,0};
-  colors[1][2] = {0,0,0};
-  colors[1][3] = {0,0,0};
-  colors[1][4] = {0,0,0};
-  colors[1][5] = {0,0,0};
-  colors[1][6] = {0,0,0};
-  colors[1][7] = {0,0,0};
-
-  colors[1][8] = {0,0,0};
-  colors[1][9] = {0,0,0};
-  colors[1][10] = {0,0,0};
-  colors[1][11] = {0,0,0};
-  colors[1][12] = {0,0,0};
-  colors[1][13] = {0,0,0};
-  colors[1][14] = {0,0,0};
-  colors[1][15] = {0,0,0};
-
-  colors[1][16] = {0,0,0};
-  colors[1][17] = {0,0,0};
-  colors[1][18] = {0,0,0};
-  colors[1][19] = {0,0,0};
-  colors[1][20] = {0,0,0};
-  colors[1][21] = {0,0,0};
-  colors[1][22] = {0,0,0};
-  colors[1][23] = {0,0,0};
-
-  colors[1][24] = {0,0,0};
-  colors[1][25] = {0,0,0};
-  colors[1][26] = {0,0,0};
-  colors[1][27] = {0,0,0};
-  colors[1][28] = {0,0,0};
-  colors[1][29] = {0,0,0};
-  colors[1][30] = {0,0,0};
-}
-
-void init_page_2(){
-  colors[2][0] = {0,0,0};
-  colors[2][1] = {0,0,0};
-  colors[2][2] = {0,0,0};
-  colors[2][3] = {0,0,0};
-  colors[2][4] = {0,0,0};
-  colors[2][5] = {0,0,0};
-  colors[2][6] = {0,0,0};
-  colors[2][7] = {0,0,0};
-
-  colors[2][8] = {0,0,0};
-  colors[2][9] = {0,0,0};
-  colors[2][10] = {0,0,0};
-  colors[2][11] = {0,0,0};
-  colors[2][12] = {0,0,0};
-  colors[2][13] = {0,0,0};
-  colors[2][14] = {0,0,0};
-  colors[2][15] = {0,0,0};
-
-  colors[2][16] = {0,0,0};
-  colors[2][17] = {0,0,0};
-  colors[2][18] = {0,0,0};
-  colors[2][19] = {0,0,0};
-  colors[2][20] = {0,0,0};
-  colors[2][21] = {0,0,0};
-  colors[2][22] = {0,0,0};
-  colors[2][23] = {0,0,0};
-
-  colors[2][24] = {0,0,0};
-  colors[2][25] = {0,0,0};
-  colors[2][26] = {0,0,0};
-  colors[2][27] = {0,0,0};
-  colors[2][28] = {0,0,0};
-  colors[2][29] = {0,0,0};
-  colors[2][30] = {0,0,0};
-}
-
-void init_page_3(){
-  colors[3][0] = {0,0,0};
-  colors[3][1] = {0,0,0};
-  colors[3][2] = {0,0,0};
-  colors[3][3] = {0,0,0};
-  colors[3][4] = {0,0,0};
-  colors[3][5] = {0,0,0};
-  colors[3][6] = {0,0,0};
-  colors[3][7] = {0,0,0};
-
-  colors[3][8] = {0,0,0};
-  colors[3][9] = {0,0,0};
-  colors[3][10] = {0,0,0};
-  colors[3][11] = {0,0,0};
-  colors[3][12] = {0,0,0};
-  colors[3][13] = {0,0,0};
-  colors[3][14] = {0,0,0};
-  colors[3][15] = {0,0,0};
-
-  colors[3][16] = {0,0,0};
-  colors[3][17] = {0,0,0};
-  colors[3][18] = {0,0,0};
-  colors[3][19] = {0,0,0};
-  colors[3][20] = {0,0,0};
-  colors[3][21] = {0,0,0};
-  colors[3][22] = {0,0,0};
-  colors[3][23] = {0,0,0};
-
-  colors[3][24] = {0,0,0};
-  colors[3][25] = {0,0,0};
-  colors[3][26] = {0,0,0};
-  colors[3][27] = {0,0,0};
-  colors[3][28] = {0,0,0};
-  colors[3][29] = {0,0,0};
-  colors[3][30] = {0,0,0};
+  button_set[page][24] = {true,channel,0,{25,25,25}}; //Lock Screen
+  button_set[page][25] = {true,channel,0,{25,50,25}}; //Eject
+  button_set[page][26] = {false,channel,0,C_OFF};
+  button_set[page][27] = {false,channel,0,C_OFF};
+  button_set[page][28] = {false,channel,0,C_OFF};
+  button_set[page][29] = {false,channel,0,C_OFF};
+  button_set[page][30] = {true,channel,30,{10,10,10}}; // Programming Button. 
 }
 
 
-void init_page_4(){ //Email
-  colors[4][0] = RED; // Red Tag
-  colors[4][1] = ORANGE; // Orange Tag
-  colors[4][2] = PURPLE; // Set Purple
-  colors[4][3] = {0,0,2}; // Clear tag
-  colors[4][4] = {0,0,0};
-  colors[4][5] = {255,0,0}; //Delete
-  colors[4][6] = {0,0,0};
-  colors[4][7] = {25,0,255}; // Dark/Light
-
-  colors[4][8] = RED; // Red Tag
-  colors[4][9] = ORANGE; // Orange Tag
-  colors[4][10] = PURPLE; // Set Purple
-  colors[4][11] = {0,0,0};
-  colors[4][12] = {0,0,0};
-  colors[4][13] = {0,0,0};
-  colors[4][14] = {0,0,0};
-  colors[4][15] = {0,0,0};
-
-  colors[4][16] = {0,15,0x80}; //Mark message read
-  colors[4][17] = {0,0,0};
-  colors[4][18] = {0,0,0};
-  colors[4][19] = {0,0,0};
-  colors[4][20] = {0,0,0};
-  colors[4][21] = {0,0,0};
-  colors[4][22] = {0,0,0};
-  colors[4][23] = {0,0,0};
-
-  colors[4][24] = {0,25,255}; // Unread All
-  colors[4][25] = {0,0,0};
-  colors[4][26] = {0,0,0};
-  colors[4][27] = {0,0,0};
-  colors[4][28] = {0,0,0};
-  colors[4][29] = {0,0,0};
-  colors[4][30] = {0,0,0};
-
+//populate a page with no lights or midi commands. 
+void init_page_empty(byte page){
+  for (byte i = 0; i < 31; i++){
+    button_set[page][i] = {false,0,0,C_OFF};
+  }
 }
 
- void init_page_5(){
-  colors[5][0] = {0,0,0};
-  colors[5][1] = {0,0,0};
-  colors[5][2] = {0,0,0};
-  colors[5][3] = {0,0,0};
-  colors[5][4] = {0,0,0};
-  colors[5][5] = {0,0,0};
-  colors[5][6] = {0,0,0};
-  colors[5][7] = {0,0,0};
-
-  colors[5][8] = {0,0,0};
-  colors[5][9] = {0,0,0};
-  colors[5][10] = {0,0,0};
-  colors[5][11] = {0,0,0};
-  colors[5][12] = {0,0,0};
-  colors[5][13] = {0,0,0};
-  colors[5][14] = {0,0,0};
-  colors[5][15] = {0,0,0};
-
-  colors[5][16] = {0,0,0};
-  colors[5][17] = {0,0,0};
-  colors[5][18] = {0,0,0};
-  colors[5][19] = {0,0,0};
-  colors[5][20] = {0,0,0};
-  colors[5][21] = {0,0,0};
-  colors[5][22] = {0,0,0};
-  colors[5][23] = {0,0,0};
-
-  colors[5][24] = {0,0,0};
-  colors[5][25] = {0,0,0};
-  colors[5][26] = {0,0,0};
-  colors[5][27] = {0,0,0};
-  colors[5][28] = {0,0,0};
-  colors[5][29] = {0,0,0};
-  colors[5][30] = {0,0,0};
- }
-
-void init_page_6(){
-  colors[6][0] = {0,0,0};
-  colors[6][1] = {0,0,0};
-  colors[6][2] = {0,0,0};
-  colors[6][3] = {0,0,0};
-  colors[6][4] = {0,0,0};
-  colors[6][5] = {0,0,0};
-  colors[6][6] = {0,0,0};
-  colors[6][7] = {0,0,0};
-
-  colors[6][8] = {0,0,0};
-  colors[6][9] = {0,0,0};
-  colors[6][10] = {0,0,0};
-  colors[6][11] = {0,0,0};
-  colors[6][12] = {0,0,0};
-  colors[6][13] = {0,0,0};
-  colors[6][14] = {0,0,0};
-  colors[6][15] = {0,0,0};
-
-  colors[6][16] = {0,0,0};
-  colors[6][17] = {0,0,0};
-  colors[6][18] = {0,0,0};
-  colors[6][19] = {0,0,0};
-  colors[6][20] = {0,0,0};
-  colors[6][21] = {0,0,0};
-  colors[6][22] = {0,0,0};
-  colors[6][23] = {0,0,0};
-
-  colors[6][24] = {0,0,0};
-  colors[6][25] = {0,0,0};
-  colors[6][26] = {0,0,0};
-  colors[6][27] = {0,0,0};
-  colors[6][28] = {0,0,0};
-  colors[6][29] = {0,0,0};
-  colors[6][30] = {0,0,0};
+//populate a page with no lights, but 31 MIDI keys. 
+void init_page_blank(byte page, byte channel, byte first_note){
+  for (byte i = 0; i < 31; i++){
+    button_set[page][i] = {true,channel,first_note + i,C_OFF};
+  }
 }
 
-void init_page_7(){
-  colors[7][0] = {0,0,0};
-  colors[7][1] = {0,0,0};
-  colors[7][2] = {0,0,0};
-  colors[7][3] = {0,0,0};
-  colors[7][4] = {0,0,0};
-  colors[7][5] = {0,0,0};
-  colors[7][6] = {0,0,0};
-  colors[7][7] = {0,0,0};
+void init_page_email(byte page){ //Email
+  byte channel = page;
+  button_set[page][0] = {true,channel,0,C_RED}; // Red Tag
+  button_set[page][1] = {true,channel,1,C_ORANGE}; // Orange Tag
+  button_set[page][2] = {true,channel,2,C_PURPLE}; // Set Purple
+  button_set[page][3] = {true,channel,3,{0,0,5}}; // Clear tag
+  button_set[page][4] = {false,channel,4,C_OFF};
+  button_set[page][5] = {true,channel,5,{255,0,0}}; //Delete
+  button_set[page][6] = {false,channel,5,C_OFF};
+  button_set[page][7] = {true,channel,7,{25,0,255}}; // Dark/Light
 
-  colors[7][8] = {0,0,0};
-  colors[7][9] = {0,0,0};
-  colors[7][10] = {0,0,0};
-  colors[7][11] = {0,0,0};
-  colors[7][12] = {0,0,0};
-  colors[7][13] = {0,0,0};
-  colors[7][14] = {0,0,0};
-  colors[7][15] = {0,0,0};
+  button_set[page][8] = {true,channel,8,C_RED}; // Red Tag
+  button_set[page][9] = {true,channel,9,C_ORANGE}; // Orange Tag
+  button_set[page][10] = {true,channel,10,C_PURPLE}; // Set Purple
+  button_set[page][11] = {false,0,11,C_OFF};
+  button_set[page][12] = {false,0,12,C_OFF};
+  button_set[page][13] = {false,0,13,C_OFF};
+  button_set[page][14] = {false,0,14,C_OFF};
+  button_set[page][15] = {false,0,15,C_OFF};
 
-  colors[7][16] = {0,0,0};
-  colors[7][17] = {0,0,0};
-  colors[7][18] = {0,0,0};
-  colors[7][19] = {0,0,0};
-  colors[7][20] = {0,0,0};
-  colors[7][21] = {0,0,0};
-  colors[7][22] = {0,0,0};
-  colors[7][23] = {0,0,0};
+  button_set[page][16] = {true,channel,16,{0,15,0x80}}; //Mark message read
+  button_set[page][17] = {false,0,17,C_OFF};
+  button_set[page][18] = {false,0,18,C_OFF};
+  button_set[page][19] = {false,0,19,C_OFF};
+  button_set[page][20] = {false,0,20,C_OFF};
+  button_set[page][21] = {false,0,21,C_OFF};
+  button_set[page][22] = {false,0,22,C_OFF};
+  button_set[page][23] = {false,0,23,C_OFF};
 
-  colors[7][24] = {0,0,0};
-  colors[7][25] = {0,0,0};
-  colors[7][26] = {0,0,0};
-  colors[7][27] = {0,0,0};
-  colors[7][28] = {0,0,0};
-  colors[7][29] = {0,0,0};
-  colors[7][30] = {0,0,0};
+  button_set[page][24] = {true,channel,24,{0,25,255}}; // Unread All
+  button_set[page][25] = {false,0,25,C_OFF};
+  button_set[page][26] = {false,0,26,C_OFF};
+  button_set[page][27] = {false,0,27,C_OFF};
+  button_set[page][28] = {false,0,28,C_OFF};
+  button_set[page][29] = {false,0,29,C_OFF};
+  button_set[page][30] = {false,0,30,C_OFF};
 }
 
 void init_pages(){
-  init_page_0();
-  init_page_1();
-  init_page_2();
-  init_page_3();
-  init_page_4();
-  init_page_5();
-  init_page_6();
-  init_page_7();
+  init_page_main(0);
+  init_page_blank(1,1,0);
+  init_page_empty(2);
+  init_page_empty(3);
+  init_page_email(4);
+  for(int i = 5; i < 16; i++){
+    init_page_empty(i);
+  }
 }

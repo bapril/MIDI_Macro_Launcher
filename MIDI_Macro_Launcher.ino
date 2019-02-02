@@ -7,9 +7,8 @@
 #define BANKSEL 1
 #define MACRO 0
 
-#define LED_OFF 0x00
-
 #define BANKSEL_KEY 31
+#define START_PAGE 0
 
 #include <Adafruit_NeoTrellisM4.h>
 
@@ -23,12 +22,12 @@ void setup(){
 
   // USB MIDI messages sent over the micro B USB port
   trellis.enableUSBMIDI(true);
-  trellis.setUSBMIDIchannel(channel);
 
   init_pages();
   init_banksel();
 
-  color_keys(channel,first_note);
+  page = START_PAGE;
+  color_keys(page);
   trellis.tick();
 }
 
@@ -39,55 +38,63 @@ void loop() {
   while (trellis.available()){
     keypadEvent e = trellis.read();
     int key = e.bit.KEY;
-    if (key == 31 && e.bit.EVENT == KEY_JUST_PRESSED){ //Select Bank page. 
+    str_btn *active_key;
+    if (key == 31){
+      if (e.bit.EVENT == KEY_JUST_PRESSED){ //Select page list.
         render_banksel();
         mode = BANKSEL;
-    } else if (key == 31 && e.bit.EVENT == KEY_JUST_RELEASED){ 
+      }
     } else if (mode == BANKSEL){
-        if (key < 8){
-          channel = key;
-          trellis.setUSBMIDIchannel(channel);
-        }
-        color_keys(channel,first_note);
-        mode = MACRO;
+      if (key < (sizeof(banksel)/sizeof(str_rgbcolor))) page=key;
+      color_keys(page);
+      mode = MACRO;
     } else {
-      if (e.bit.EVENT == KEY_JUST_PRESSED) {
-        trellis.setPixelColor(key, 0xFFFFFF);
-        trellis.noteOn(first_note+key, 64);
-      } else if (e.bit.EVENT == KEY_JUST_RELEASED) {
-        trellis.setPixelColor(key, gen_color_ptr(&colors[channel][first_note + key]));
-        trellis.noteOff(first_note+key, 64);
+      active_key = &button_set[page][key];
+      if(active_key->active){
+        if (e.bit.EVENT == KEY_JUST_PRESSED) {
+          trellis.setPixelColor(key, 0xFFFFFF);
+          trellis.setUSBMIDIchannel(active_key->channel);
+          trellis.noteOn(active_key->note, 64);
+        } else if (e.bit.EVENT == KEY_JUST_RELEASED) {
+          trellis.setPixelColor(key, gen_color_ptr(&active_key->color));
+          trellis.setUSBMIDIchannel(active_key->channel);
+          trellis.noteOff(active_key->note, 64);
+        }
       }
     }
   }
   trellis.sendMIDI(); // send any pending MIDI messages
-
   delay(10);
 }
 
-void color_keys(int ch, int key_in){
-  rgbcolor col;
+void color_keys(byte page){
+  str_btn *active_key;
   for (int i = 0; i < 30; i++){
-    if(colors[ch][key_in + i].r or colors[ch][key_in + i].g or colors[ch][key_in + i].b){
-      trellis.setPixelColor(key_in + i, gen_color_ptr(&colors[ch][key_in + i]));
+    active_key = &button_set[page][i];
+    if(active_key->active){
+      trellis.setPixelColor(i, gen_color_ptr(&active_key->color));
     } else {
-      trellis.setPixelColor(key_in + i, LED_OFF);
+      trellis.setPixelColor(i, gen_color(C_OFF));
     }
   }
-  trellis.setPixelColor(BANKSEL_KEY, gen_color_ptr(&banksel[channel]));
+  trellis.setPixelColor(BANKSEL_KEY, gen_color_ptr(&banksel[page]));
 }
 
 void render_banksel(){
-  for (int j = 0; j < banksize; j++){
+  byte b_size = (sizeof(banksel)/sizeof(str_rgbcolor));
+  for (int j = 0; j < b_size; j++){
     trellis.setPixelColor(j,gen_color_ptr(&banksel[j]));
   }
-  for (int i = banksize; i < 31; i++){
-    trellis.setPixelColor(i,LED_OFF);
+  for (int i = b_size; i < 31; i++){
+    trellis.setPixelColor(i,gen_color(C_OFF));
   }
-  trellis.setPixelColor(BANKSEL_KEY,LED_OFF);
+  trellis.setPixelColor(BANKSEL_KEY,gen_color(C_OFF));
 }
 
-uint32_t gen_color_ptr(rgbcolor *color) {
+uint32_t gen_color(str_rgbcolor color){
+  return ((long)color.r << 16L) + ((long)color.g << 8L) + ((long)color.b);
+}
+uint32_t gen_color_ptr(str_rgbcolor *color) {
   return ((long)color->r << 16L) + ((long)color->g << 8L) + ((long)color->b);
 }
 
