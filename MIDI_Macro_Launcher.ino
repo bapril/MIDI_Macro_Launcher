@@ -4,21 +4,34 @@
 // was: 
 // Trellis M4 MIDI Keypad CC
 // sends 32 notes, pitch bend & a CC from accelerometer tilt over USB MIDI
-#define BANKSEL 1
-#define MACRO 0
 
-#define BANKSEL_KEY 31
+//Adjustable values
 #define START_PAGE 0
+#define SCREENSAVER_MILLIS 300000
+#define BRIGHTNESS 70
+
+//States
+#define M_BANKSEL 1
+#define M_MACRO 0
+#define M_SCREENSAVER 2
+
+//Fixed Values
+#define BANKSEL_KEY 31
 
 #include <Adafruit_NeoTrellisM4.h>
-
 #include "midi_launcher.h"
+
+long last_press = millis();
+byte brightness = BRIGHTNESS;
+byte page = 0;
+int mode = M_MACRO;
+int last_mode = M_MACRO;
 
 Adafruit_NeoTrellisM4 trellis = Adafruit_NeoTrellisM4();
 
 void setup(){
   trellis.begin();
-  trellis.setBrightness(70);
+  trellis.setBrightness(brightness);
 
   // USB MIDI messages sent over the micro B USB port
   trellis.enableUSBMIDI(true);
@@ -32,25 +45,37 @@ void setup(){
 }
 
 void loop() {
+  bool have_midi = false;
   // put your main code here, to run repeatedly:
   trellis.tick();
-
   while (trellis.available()){
     keypadEvent e = trellis.read();
     int key = e.bit.KEY;
     str_btn *active_key;
-    if (key == 31){
+    if (e.bit.EVENT == KEY_JUST_PRESSED or e.bit.EVENT == KEY_JUST_RELEASED){
+      last_press = millis();
+    }
+    if (mode == M_SCREENSAVER){
+      if (e.bit.EVENT == KEY_JUST_RELEASED){ //Only react to a release, so we don't count the press. 
+        for(; brightness < BRIGHTNESS; brightness++){
+          trellis.setBrightness(brightness);
+          trellis.show();
+        }
+        mode = last_mode;
+      }
+    } else if (key == BANKSEL_KEY){
       if (e.bit.EVENT == KEY_JUST_PRESSED){ //Select page list.
         render_banksel();
-        mode = BANKSEL;
+        mode = M_BANKSEL;
       }
-    } else if (mode == BANKSEL){
+    } else if (mode == M_BANKSEL){
       if (key < (sizeof(banksel)/sizeof(str_rgbcolor))) page=key;
       color_keys(page);
-      mode = MACRO;
+      mode = M_MACRO;
     } else {
       active_key = &button_set[page][key];
       if(active_key->active){
+        have_midi = true;
         if (e.bit.EVENT == KEY_JUST_PRESSED) {
           trellis.setPixelColor(key, 0xFFFFFF);
           trellis.setUSBMIDIchannel(active_key->channel);
@@ -63,7 +88,16 @@ void loop() {
       }
     }
   }
-  trellis.sendMIDI(); // send any pending MIDI messages
+  if (SCREENSAVER_MILLIS > 0 & (millis() - last_press) > SCREENSAVER_MILLIS){
+    if(mode != M_SCREENSAVER) last_mode = mode;
+    mode = M_SCREENSAVER;
+    if (brightness > 0){
+      brightness--;
+      trellis.setBrightness(brightness);
+      trellis.show();
+    }
+  }
+  if (have_midi) trellis.sendMIDI(); // send any pending MIDI messages
   delay(10);
 }
 

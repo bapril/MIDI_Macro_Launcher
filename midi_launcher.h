@@ -29,9 +29,6 @@ typedef struct {
   str_rgbcolor color;
 } str_btn;
 
-byte page = 0;
-int mode = MACRO;
-
 str_btn button_set[31][31];
 str_rgbcolor banksel[31];
 
@@ -92,7 +89,6 @@ void init_page_main(byte page){ //Main
   button_set[page][30] = {true,channel,30,{10,10,10}}; // Programming Button. 
 }
 
-
 //populate a page with no lights or midi commands. 
 void init_page_empty(byte page){
   for (byte i = 0; i < 31; i++){
@@ -103,7 +99,7 @@ void init_page_empty(byte page){
 //populate a page with no lights, but 31 MIDI keys. 
 void init_page_blank(byte page, byte channel, byte first_note){
   for (byte i = 0; i < 31; i++){
-    button_set[page][i] = {true,channel,first_note + i,C_OFF};
+    button_set[page][i] = {true,channel,(byte)((int)first_note + (int)i),C_OFF};
   }
 }
 
