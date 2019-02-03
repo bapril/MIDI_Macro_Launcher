@@ -71,21 +71,21 @@ void init_page_main(byte page){ //Main
   button_set[page][14] = {false,channel,14,C_OFF};
   button_set[page][15] = {true,channel,15,{50,50,25}}; //github.com
 
-  button_set[page][16] = {true,channel,0,{0,5,50}}; //MS word Focus
-  button_set[page][17] = {false,channel,0,C_OFF};
-  button_set[page][18] = {false,channel,0,C_OFF};
-  button_set[page][19] = {false,channel,0,C_OFF};
-  button_set[page][20] = {false,channel,0,C_OFF};
-  button_set[page][21] = {false,channel,0,C_OFF};
-  button_set[page][22] = {true,channel,0,{50,25,50}}; //Exp
-  button_set[page][23] = {true,channel,0,{25,50,25}}; //bill
+  button_set[page][16] = {true,channel,16,{0,5,50}}; //MS word Focus
+  button_set[page][17] = {false,channel,17,C_OFF};
+  button_set[page][18] = {false,channel,18,C_OFF};
+  button_set[page][19] = {false,channel,19,C_OFF};
+  button_set[page][20] = {false,channel,20,C_OFF};
+  button_set[page][21] = {false,channel,21,C_OFF};
+  button_set[page][22] = {true,channel,22,{50,25,50}}; //Exp
+  button_set[page][23] = {true,channel,23,{25,50,25}}; //bill
 
-  button_set[page][24] = {true,channel,0,{25,25,25}}; //Lock Screen
-  button_set[page][25] = {true,channel,0,{25,50,25}}; //Eject
-  button_set[page][26] = {false,channel,0,C_OFF};
-  button_set[page][27] = {false,channel,0,C_OFF};
-  button_set[page][28] = {false,channel,0,C_OFF};
-  button_set[page][29] = {false,channel,0,C_OFF};
+  button_set[page][24] = {true,channel,24,{25,25,25}}; //Lock Screen
+  button_set[page][25] = {true,channel,25,{25,50,25}}; //Eject
+  button_set[page][26] = {false,channel,26,C_OFF};
+  button_set[page][27] = {false,channel,27,C_OFF};
+  button_set[page][28] = {false,channel,28,C_OFF};
+  button_set[page][29] = {false,channel,29,C_OFF};
   button_set[page][30] = {true,channel,30,{10,10,10}}; // Programming Button.
 }
 
