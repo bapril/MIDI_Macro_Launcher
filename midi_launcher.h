@@ -141,10 +141,48 @@ void init_page_email(byte page){ //Email
   button_set[page][30] = {false,0,30,C_OFF};
 }
 
+//Template: copy/rename this function and build your own pages.
+void init_page_template(byte page,byte channel){
+  button_set[page][0] = {true,channel,0,C_OFF};
+  button_set[page][1] = {true,channel,1,C_OFF};
+  button_set[page][2] = {true,channel,2,C_OFF};
+  button_set[page][3] = {true,channel,3,C_OFF};
+  button_set[page][4] = {true,channel,4,C_OFF};
+  button_set[page][5] = {true,channel,5,C_OFF};
+  button_set[page][6] = {true,channel,5,C_OFF};
+  button_set[page][7] = {true,channel,7,C_OFF};
+
+  button_set[page][8] = {true,channel,8,C_OFF};
+  button_set[page][9] = {true,channel,9,C_OFF};
+  button_set[page][10] = {true,channel,10,C_OFF};
+  button_set[page][11] = {true,channel,11,C_OFF};
+  button_set[page][12] = {true,channel,12,C_OFF};
+  button_set[page][13] = {true,channel,13,C_OFF};
+  button_set[page][14] = {true,channel,14,C_OFF};
+  button_set[page][15] = {true,channel,15,C_OFF};
+
+  button_set[page][16] = {true,channel,16,C_OFF};
+  button_set[page][17] = {true,channel,17,C_OFF};
+  button_set[page][18] = {true,channel,18,C_OFF};
+  button_set[page][19] = {true,channel,19,C_OFF};
+  button_set[page][20] = {true,channel,20,C_OFF};
+  button_set[page][21] = {true,channel,21,C_OFF};
+  button_set[page][22] = {true,channel,22,C_OFF};
+  button_set[page][23] = {true,channel,23,C_OFF};
+
+  button_set[page][24] = {true,channel,24,C_OFF};
+  button_set[page][25] = {true,channel,25,C_OFF};
+  button_set[page][26] = {true,channel,26,C_OFF};
+  button_set[page][27] = {true,channel,27,C_OFF};
+  button_set[page][28] = {true,channel,28,C_OFF};
+  button_set[page][29] = {true,channel,29,C_OFF};
+  button_set[page][30] = {true,channel,30,C_OFF};
+}
+
 void init_pages(){
   init_page_main(0);
   init_page_blank(1,1,0);
-  init_page_empty(2);
+  init_page_template(2,2);
   init_page_empty(3);
   init_page_email(4);
   for(int i = 5; i < 16; i++){
