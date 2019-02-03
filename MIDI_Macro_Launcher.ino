@@ -1,7 +1,7 @@
 // Tressli M4 MIDI Keypad for macro triggering
-// 31 notes color-coded and 1 key to select a new bank. 
+// 31 notes color-coded and 1 key to select a new bank.
 
-// was: 
+// was:
 // Trellis M4 MIDI Keypad CC
 // sends 32 notes, pitch bend & a CC from accelerometer tilt over USB MIDI
 
@@ -56,7 +56,7 @@ void loop() {
       last_press = millis();
     }
     if (mode == M_SCREENSAVER){
-      if (e.bit.EVENT == KEY_JUST_RELEASED){ //Only react to a release, so we don't count the press. 
+      if (e.bit.EVENT == KEY_JUST_RELEASED){ //Only react to a release, so we don't count the press.
         for(; brightness < BRIGHTNESS; brightness++){
           trellis.setBrightness(brightness);
           trellis.show();

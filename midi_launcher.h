@@ -86,17 +86,17 @@ void init_page_main(byte page){ //Main
   button_set[page][27] = {false,channel,0,C_OFF};
   button_set[page][28] = {false,channel,0,C_OFF};
   button_set[page][29] = {false,channel,0,C_OFF};
-  button_set[page][30] = {true,channel,30,{10,10,10}}; // Programming Button. 
+  button_set[page][30] = {true,channel,30,{10,10,10}}; // Programming Button.
 }
 
-//populate a page with no lights or midi commands. 
+//populate a page with no lights or midi commands.
 void init_page_empty(byte page){
   for (byte i = 0; i < 31; i++){
     button_set[page][i] = {false,0,0,C_OFF};
   }
 }
 
-//populate a page with no lights, but 31 MIDI keys. 
+//populate a page with no lights, but 31 MIDI keys.
 void init_page_blank(byte page, byte channel, byte first_note){
   for (byte i = 0; i < 31; i++){
     button_set[page][i] = {true,channel,(byte)((int)first_note + (int)i),C_OFF};
