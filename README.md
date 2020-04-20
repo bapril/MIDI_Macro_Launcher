@@ -1,5 +1,9 @@
 # MIDI_Macro_Launcher
 
+## Abandon-in-place
+This project has been replaced. The new version us based on CircuitPython so updates to the button layouts no-longer require a code change. The new project is here: https://github.com/bapril/TrellisM4_MIDI_Keypad
+
+
 ## Overview
 This project started based on John Park's Launch Deck example (https://blog.adafruit.com/2018/12/01/new-guide-john-parks-launch-deck-trellis-m4-adafruit-johnedgarpark-adafruit/). I found tracking multiple layers of keystrokes to be a pain and likely to conflict with existing keyboard macros so i sought another approach. As I don't use midi in my day to day work this works for me.
 
